@@ -23,9 +23,7 @@ var sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune;
 renderer.setClearColor(0x000000); // white background colour
 canvas.appendChild(renderer.domElement);
 
-keyboard.domElement.addEventListener( 'mousedown', mousedown);
-keyboard.domElement.addEventListener( 'mouseup', mouseup);
-
+registerKeyboardListeners();
 initCamera();
 initGeometry();
 update();
@@ -93,7 +91,7 @@ function initCamera() {
   scene.add(mapCamera);
 
   // SETUP ORBIT CONTROLS OF THE CAMERA
-  controls = new THREE.OrbitControls(fullCamera);
+  // controls = new THREE.OrbitControls(fullCamera);
 
   // EVENT LISTENER RESIZE
   window.addEventListener('resize',resize);
@@ -263,7 +261,6 @@ function createOrbitCircle(radius) {
 
 function updateSystem() {
   // orbit around sun
-  sun.applyMatrix(new THREE.Matrix4().makeRotationY(0.001));
   mercury.applyMatrix(new THREE.Matrix4().makeRotationY(0.04));
   venus.applyMatrix(new THREE.Matrix4().makeRotationY(0.02));
   earth.applyMatrix(new THREE.Matrix4().makeRotationY(0.01));
@@ -330,6 +327,11 @@ function update() {
   requestAnimationFrame(update);
 }
 
+function registerKeyboardListeners() {
+  keyboard.domElement.addEventListener('keydown', onKeyDown );
+  keyboard.domElement.addEventListener( 'mousedown', mousedown);
+  keyboard.domElement.addEventListener( 'mouseup', mouseup);
+}
 
 
 // ============================================================================
@@ -338,6 +340,20 @@ function update() {
 //
 // ============================================================================
 
+function onKeyDown(event) {
+  if (keyboard.eventMatches(event,"w")) {
+    // move camera forwards
+  }
+  else if (keyboard.eventMatches(event, "s")) {
+    // move camera back
+  }
+  else if (keyboard.eventMatches(event, "a")) {
+    // rotate camera left
+  }
+  else if (keyboard.eventMatches(event, "d")) {
+    // rotate camera right
+  }
+}
 
 function mousedown(event) {
   event.preventDefault();
