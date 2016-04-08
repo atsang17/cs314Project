@@ -1,12 +1,13 @@
-function generateMap(exit) {
+function generateMap(entrance, exit) {
     //arbitrary 15x15 maps each node
     var width = 15;
     var height = 15;
 
     var exitSide = exit;
+    var entranceSide = entrance;
 
     var map = new int[width, height];
-    randomFillMap(width, height, map, exitSide);
+    randomFillMap(width, height, map, entranceSide, exitSide);
 
     for (i = 0; i < 5; i++) {
         smoothMap(map);
@@ -15,9 +16,9 @@ function generateMap(exit) {
     return map;
 }
 
-function randomFillMap(width, height, map, exitSide) {
+function randomFillMap(width, height, map, exitSide, entrance) {
     var seed;
-    var randomFillPercent = 30;
+    var randomFillPercent = 20;
 
     //needs to be changed for time
     seed = new Date().toUTCString;
@@ -26,6 +27,23 @@ function randomFillMap(width, height, map, exitSide) {
         for (y = 0; y < height; y++) {
             if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
                 map[x, y] = 1;
+                if (exitSide == "n" || entrance == "n") {
+                    map[8, 0] = 0;
+                    map[7, 0] = 0;
+                    map[9, 0] = 0;
+                } else if (exitSide == "w" || entrance == "w") {
+                    map[0, 8] = 0;
+                    map[0, 7] = 0;
+                    map[0, 9] = 0;
+                } else if (exitSide == "s" || entrance == "s") {
+                    map[8, 14] = 0;
+                    map[7, 14] = 0;
+                    map[9, 14] = 0;
+                } else if (exitSide == "e" || entrance == "e") {
+                    map[14, 8] = 0;
+                    map[14, 7] = 0;
+                    map[14, 9] = 0;
+                }
             } else {
                 // needs to be changed for using random number generator
                 map[x, y] = (Math.floor(Math.random() * 100) < randomFillPercent) ? 1 : 0;
@@ -63,28 +81,3 @@ function getSurroundingWalls(x, y) {
     }
     return wallcount;
 }
-
-function createExits(side, map) {
-    switch (side) {
-        case "n":
-            map[8, 0] = 0;
-            map[7, 0] = 0;
-            map[9, 0] = 0;
-            break;
-        case "w":
-            map[0, 8] = 0;
-            map[0, 7] = 0;
-            map[0, 9] = 0;
-            break;
-        case "e":
-            map[15, 8] = 0;
-            map[15, 7] = 0;
-            map[15, 9] = 0;
-            break;
-        case "s":
-            map[8, 15] = 0;
-            map[7, 15] = 0;
-            map[9, 15] = 0;
-            break;
-    }
-} 
