@@ -79,9 +79,9 @@ function initCamera() {
     // initialize earth
     var material = new THREE.MeshPhongMaterial();
     material.map = THREE.ImageUtils.loadTexture('assets/earthmap1k.jpg');
-    var earthGeometry = new THREE.SphereGeometry( 1, 32, 32 );
+    var earthGeometry = new THREE.SphereGeometry(1, 32, 32);
     generateVertexColors(earthGeometry);
-    earth = new THREE.Mesh( earthGeometry, material);
+    earth = new THREE.Mesh(earthGeometry, material);
     scene.add(earth);
 
     // setup camera to follow earth
@@ -253,10 +253,10 @@ function initGeometry() {
     sun.add(neptune);
     //createOrbitCircle(55);
 
-    var FloorGeo = new THREE.BoxGeometry(150, 5, 300);
+    var FloorGeo = new THREE.BoxGeometry(300, 5, 150);
     var floormaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
     var floor = new THREE.Mesh(FloorGeo, floormaterial);
-    var floorTransform = new THREE.Matrix4().makeTranslation(0, -20, 0);
+    var floorTransform = new THREE.Matrix4().makeTranslation(0, -5, 0);
 
     var positionX = 0;
     var positionY = 0;
@@ -272,21 +272,17 @@ function initGeometry() {
         //console.log(map);
         //console.log("hi");
         //console.log(map[0][0]);
-<<<<<<< HEAD
-        
-        var offsetX = 1;
+
+        //var offsetX = 1;
         var offsetY = 1;
-=======
+        var offsetX = 1;
 
-        var offsetX;
-        var offsetY;
->>>>>>> ed9b936e62fffa9e4f3c49e90334715cb4d1e720
 
-        for (x = 0; x < 4; x++) {
-            for (y = 0; y < 2; y++) {
-                if (y == 1) {offsetY = -1;}
-                if (x > 1) {offsetX = -1}
-                createMap(map[x][y], floor, offsetX, offsetY, x);
+        for (var x = 0; x < 4; x++) {
+            for (var y = 0; y < 2; y++) {
+                if (y > 0) { offsetY = -1; }
+                if (x > 1) { offsetX = -1 }
+                createMap(map[x][y], floor, offsetX, offsetY, x, y);
             }
         }
 
@@ -393,11 +389,11 @@ function registerKeyboardListeners() {
 function onKeyDown(event) {
     if (keyboard.eventMatches(event, "w")) {
         // move camera forwards
-        earth.translateOnAxis(new THREE.Vector3(0,0,-1), 1);
+        earth.translateOnAxis(new THREE.Vector3(0, 0, -1), 1);
     }
     else if (keyboard.eventMatches(event, "s")) {
         // move camera back
-        earth.translateOnAxis(new THREE.Vector3(0,0,-1), -1);
+        earth.translateOnAxis(new THREE.Vector3(0, 0, -1), -1);
     }
     else if (keyboard.eventMatches(event, "a")) {
         // rotate camera left
@@ -464,7 +460,7 @@ function generateMap(entrance, exit) {
 function randomFillMap(width, height, map, exitSide, entrance) {
     //console.log(map);
     var seed;
-    var randomFillPercent = 20;
+    var randomFillPercent = 50;
     //console.log("made it here");
 
     //needs to be changed for time
@@ -476,32 +472,30 @@ function randomFillMap(width, height, map, exitSide, entrance) {
             //console.log(x == 0 || x == width - 1 || y == 0 || y == height - 1);
             if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
                 //console.log("yes");
-                map[x].push(1);
-
-                /*if (exitSide == "n" || entrance == "n") {
+                map[x][y] = 1;
+/*
+                if (exitSide == "n" || entrance == "n") {
                     map[8][0] = 0;
                     map[7][0] = 0;
                     map[9][0] = 0;
                 } else if (exitSide == "w" || entrance == "w") {
                     map[0][8] = 0;
-                    map[0] [7] = 0;
-                    map[0] [9] = 0;
+                    map[0][7] = 0;
+                    map[0][9] = 0;
                 } else if (exitSide == "s" || entrance == "s") {
-                    map[8] [14] = 0;
-                    map[7] [14] = 0;
-                    map[9] [14] = 0;
+                    map[8][14] = 0;
+                    map[7][14] = 0;
+                    map[9][14] = 0;
                 } else if (exitSide == "e" || entrance == "e") {
-                    map[14] [8] = 0;
-                    map[14] [7] = 0;
-                    map[14] [9] = 0;
-                } else if (exitSide == "0" || entrance == "0") {
-                    console.log("poop");
+                    map[14][8] = 0;
+                    map[14][7] = 0;
+                    map[14][9] = 0;
                 }
                 */
                 //console.log("yes");
             } else {
                 // needs to be changed for using random number generator
-                map[x].push((Math.floor(Math.random() * 100) < randomFillPercent) ? 1 : 0);
+                map[x][y] = (Math.floor(Math.random() * 100) < randomFillPercent) ? 1 : 0;
                 //console.log("yes");
             }
 
@@ -527,8 +521,8 @@ function smoothMap(map) {
 
 function getSurroundingWalls(x, y) {
     var wallcount = 0;
-    for (i = x - 1; i <= x + 1; x++) {
-        for (j = y - 1; j <= y + 1; y++) {
+    for (var i = x - 1; i <= x + 1; x++) {
+        for (var j = y - 1; j <= y + 1; y++) {
             if (i >= 0 && j >= 0 && i < width && j < height) {
                 if (i != x || j != y) {
                     wallcount += map[i][j];
@@ -547,26 +541,26 @@ function binaryMapping() {
     while (mapLayout.length < 5) {
         mapLayout = "0" + mapLayout;
     }
-    //console.log(mapLayout);
+    console.log(mapLayout);
     var map = [[], [], [], []];
     for (var i = 0; i < 4; i++) {
         var bit = mapLayout.charAt(i) + mapLayout.charAt(i + 1);
         //console.log(bit == 00 || bit == 11 || bit == 01 || bit == 10);
         if (bit == 00) {
-            map[i].push(0);
             map[i].push(1);
+            map[i].push(0);
             console.log("case1");
         } else if (bit == 11) {
-            map[i].push(1);
             map[i].push(0);
+            map[i].push(1);
             console.log("case2");
         } else if (bit == 10) {
-            map[i].push(1);
             map[i].push(2);
+            map[i].push(1);
             console.log("case3");
         } else if (bit == 01) {
-            map[i].push(2);
             map[i].push(1);
+            map[i].push(2);
             console.log("case4");
         }
         //console.log(map[0]);
@@ -581,6 +575,7 @@ function makeMap() {
     //console.log("back from mapping");
     for (var i = 0; i < 4; i++) {
         console.log(i);
+        console.log(mapArray[i]);
         //console.log(true);
         if (mapArray[i][0] == 0 && mapArray[i][0] == 1) {
             if (i == 0) {
@@ -590,7 +585,7 @@ function makeMap() {
             } else {
                 mapArray[i][1] = generateMap("w", "e");
             }
-            //console.log(mapArray[i]);
+            console.log(mapArray[i]);
         } else if (mapArray[i][0] == 1 && mapArray[i][1] == 0) {
             if (i == 0) {
                 mapArray[i][0] = generateMap("0", "e");
@@ -599,7 +594,7 @@ function makeMap() {
             } else {
                 mapArray[i][0] = (generateMap("w", "e"));
             }
-            //console.log(mapArray[i]);
+            console.log(mapArray[i]);
         } else if (mapArray[i][0] == 2 && mapArray[i][1] == 1) {
             if (i == 0) {
                 mapArray[i][0] = generateMap("s", "e");
@@ -611,18 +606,19 @@ function makeMap() {
                 mapArray[i][0] = generateMap("s", "e");
                 mapArray[i][1] = generateMap("w", "n");
             }
-            //console.log(mapArray[i]);
+            console.log(mapArray[i]);
         } else if (mapArray[i][0] == 1 && mapArray[i][1] == 2) {
             if (i == 0) {
-                mapArray[i][0] = generateMap("n", "e");
-                mapArray[i][1] = generateMap("0", "s");
+                mapArray[i][0] = generateMap("0", "s");
+                mapArray[i][1] = generateMap("n", "e");
             } else if (i == 3) {
-                mapArray[i][1] = generateMap("n", "0");
-                mapArray[i][0] = generateMap("w", "s");
-            } else {
-                mapArray[i][0] = generateMap("n", "e");
                 mapArray[i][1] = generateMap("w", "s");
+                mapArray[i][0] = generateMap("n", "0");
+            } else {
+                mapArray[i][0] = generateMap("w", "s");
+                mapArray[i][1] = generateMap("n", "e");
             }
+            console.log(mapArray[i]);
         }
 
     }
@@ -631,47 +627,41 @@ function makeMap() {
 
 }
 
-
-<<<<<<< HEAD
 //takes in index of the map 
-function createMap(mapSector, floor, offsetX, offsetY, x) {
-    var unitWallGeo = new THREE.BoxGeometry(5, 15, 5);
+function createMap(mapSector, floor, offsetX, offsetY, xInput, yInput) {
+    var unitWallGeo = new THREE.BoxGeometry(5, 12.5, 5);
     var fill = new THREE.BoxGeometry(75, 15, 75);
     var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    
-    var posX = 112.5 - (75 * x);
-    var posY = 37.5 * offsetY;
-=======
-//takes in index of the map
-function createMap(mapSector, floor, offsetX, offsetY) {
-    var unitWallGeo = new THREE.BoxGeometry(5, 15, 5);
-    var fill = new THREE.BoxGeometry(75, 15, 75);
-    var material = new THREE.MeshPhongMaterial({ color: 0xffffff });
-
->>>>>>> ed9b936e62fffa9e4f3c49e90334715cb4d1e720
-
+    var wallmaterial = new THREE.MeshBasicMaterial({ color: 0x333333 });
+    var posX;
+    var posY;
     if (mapSector == 0) {
-        //console.log("creating fill");
+        posX = 112.5 - (75 * xInput);
+        posY = (37.5 * offsetY) - 0.5;
+        console.log("creating fill");
         var fillMesh = new THREE.Mesh(fill, material);
         fillMesh.applyMatrix(new THREE.Matrix4().makeTranslation(posX, 0, posY));
         floor.add(fillMesh);
-    }
+    } else {
+        posX = 150 - (75 * xInput) + 2.5;
+        posY = 75 - (75 * yInput) - .5
+        for (var x = 0; x < mapSector.length; x++) {
+            posX -= 2.5;
+            for (var y = 0; y <= mapSector[x].length; y++) {
+                var unitWall;
+                posY -= 2.5;
+                //console.log("hi");
+                if (mapSector[x][y] == 1) {
+                    unitWall = new THREE.Mesh(unitWallGeo, wallmaterial);
+                    unitWall.applyMatrix(new THREE.Matrix4().makeTranslation(posX, 5, posY));
+                    floor.add(unitWall);
+                }
 
-    for (var x = 0; x < mapSector.length; x++) {
-        for (var y = 0; y < mapSector[x].length; y++) {
-            //console.log("hi");
-            if (mapSector[x][y] == 1) {
-                var unitWall = new THREE.Mesh(unitWallGeo, material);
-                //console.log("hi2");
-                floor.add(unitWall);
-                //console.log("hi3");
             }
-            offsetY += 5;
         }
-        offsetX += 5;
     }
 
-    console.log(mapSector);
+    //console.log(mapSector);
 
 
 }
