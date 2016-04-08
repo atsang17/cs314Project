@@ -262,14 +262,14 @@ function initGeometry() {
         //console.log("hi");
         //console.log(map[0][0]);
         
-        var offsetX;
-        var offsetY;
+        var offsetX = 1;
+        var offsetY = 1;
 
         for (x = 0; x < 4; x++) {
             for (y = 0; y < 2; y++) {
-                offsetX = 15 * x;
-                offsetY = 15 * y;
-                createMap(map[x][y], floor, offsetX, offsetY);
+                if (y == 1) {offsetY = -1;}
+                if (x > 1) {offsetX = -1}
+                createMap(map[x][y], floor, offsetX, offsetY, x);
             }
         }
 
@@ -612,18 +612,20 @@ function makeMap() {
 
 
 //takes in index of the map 
-function createMap(mapSector, floor, offsetX, offsetY) {
+function createMap(mapSector, floor, offsetX, offsetY, x) {
     var unitWallGeo = new THREE.BoxGeometry(5, 15, 5);
     var fill = new THREE.BoxGeometry(75, 15, 75);
     var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-
+    
+    var posX = 112.5 - (75 * x);
+    var posY = 37.5 * offsetY;
 
     if (mapSector == 0) {
         //console.log("creating fill");
         var fillMesh = new THREE.Mesh(fill, material);
+        fillMesh.applyMatrix(new THREE.Matrix4().makeTranslation(posX, 0, posY));
         floor.add(fillMesh);
     }
-
 
     for (var x = 0; x < mapSector.length; x++) {
         for (var y = 0; y < mapSector[x].length; y++) {
@@ -634,7 +636,9 @@ function createMap(mapSector, floor, offsetX, offsetY) {
                 floor.add(unitWall);
                 //console.log("hi3");
             }
+            offsetY += 5;
         }
+        offsetX += 5;
     }
 
     console.log(mapSector);
