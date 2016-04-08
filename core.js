@@ -13,6 +13,7 @@ var fullCamera, mapCamera;
 var controls;
 
 var sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune;
+var sunHeight = 500;
 
 // ============================================================================
 //
@@ -25,6 +26,7 @@ canvas.appendChild(renderer.domElement);
 
 registerKeyboardListeners();
 initCamera();
+var controls = new THREE.OrbitControls(fullCamera);
 initGeometry();
 update();
 
@@ -44,7 +46,7 @@ function initCamera() {
             width: 1.0,
             height: 1.0,
             background: new THREE.Color().setRGB(0.1, 0.1, 0.1),
-            eye: [80, 20, 80],
+            eye: [0, 5, 15],
             up: [0, 1, 0],
             fov: 45,
             updateCamera: function(camera, scene, mouseX, mouseY) { }
@@ -66,16 +68,26 @@ function initCamera() {
     // SETUP CAMERAS
     var view = views[0];
     fullCamera = new THREE.PerspectiveCamera(view.fov, aspectRatio, 1, 10000); // view angle, aspect ratio, near, far
-    fullCamera.position.set(45, 20, 40);
+    fullCamera.position.set(20, 20, 20);
     fullCamera.position.x = view.eye[0];
     fullCamera.position.y = view.eye[1];
     fullCamera.position.z = view.eye[2];
     fullCamera.up.x = view.up[0];
     fullCamera.up.y = view.up[1];
     fullCamera.up.z = view.up[2];
-    fullCamera.lookAt(scene.position);
+
+    // initialize earth
+    var material = new THREE.MeshPhongMaterial();
+    material.map = THREE.ImageUtils.loadTexture('assets/earthmap1k.jpg');
+    var earthGeometry = new THREE.SphereGeometry( 1, 32, 32 );
+    generateVertexColors(earthGeometry);
+    earth = new THREE.Mesh( earthGeometry, material);
+    scene.add(earth);
+
+    // setup camera to follow earth
+    fullCamera.lookAt(earth);
     view.camera = fullCamera;
-    scene.add(fullCamera);
+    earth.add(fullCamera);
 
     var view = views[1];
     mapCamera = new THREE.OrthographicCamera(view.left, view.right, view.top, view.bottom, view.near, view.far);
@@ -89,9 +101,6 @@ function initCamera() {
     mapCamera.lookAt(scene.position);
     view.camera = mapCamera;
     scene.add(mapCamera);
-
-    // SETUP ORBIT CONTROLS OF THE CAMERA
-    // controls = new THREE.OrbitControls(fullCamera);
 
     // EVENT LISTENER RESIZE
     window.addEventListener('resize', resize);
@@ -129,13 +138,13 @@ function initGeometry() {
     var grid = new THREE.Line(gridGeometry, gridMaterial, THREE.LinePieces);
     scene.add(grid);
 
-    var ambientLight = new THREE.AmbientLight(0x222222);
+    var ambientLight = new THREE.AmbientLight(0x444444);
     scene.add(ambientLight);
     var lights = [];
     // sun light
     lights[0] = new THREE.PointLight(0xffffff, 1, 0);
     lights[0].castShadow = true;
-    lights[0].position.set(0, 0, 0);
+    lights[0].position.set(0, 10, 0);
     scene.add(lights[0]);
 
     // Create Solar System
@@ -144,6 +153,8 @@ function initGeometry() {
     var material = new THREE.MeshBasicMaterial();
     material.map = THREE.ImageUtils.loadTexture('assets/sunmap.jpg');
     sun = new THREE.Mesh(sunGeometry, material);
+    var sunPosition = new THREE.Matrix4().makeTranslation(0, sunHeight, 0);
+    sun.applyMatrix(sunPosition);
     scene.add(sun);
 
     // initialize mercury
@@ -169,14 +180,14 @@ function initGeometry() {
     //createOrbitCircle(13);
 
     // initialize earth
-    var material = new THREE.MeshPhongMaterial();
-    material.map = THREE.ImageUtils.loadTexture('assets/earthmap1k.jpg');
-    var earthGeometry = new THREE.SphereGeometry(1, 32, 32);
-    generateVertexColors(earthGeometry);
-    earth = new THREE.Mesh(earthGeometry, material);
-    var earthPosition = new THREE.Matrix4().makeTranslation(16, 0, 0);
-    earth.applyMatrix(earthPosition);
-    sun.add(earth);
+    // var material = new THREE.MeshPhongMaterial();
+    // material.map = THREE.ImageUtils.loadTexture('assets/earthmap1k.jpg');
+    // var earthGeometry = new THREE.SphereGeometry(1, 32, 32);
+    // generateVertexColors(earthGeometry);
+    // earth = new THREE.Mesh(earthGeometry, material);
+    // var earthPosition = new THREE.Matrix4().makeTranslation(16, 0, 0);
+    // earth.applyMatrix(earthPosition);
+    // sun.add(earth);
     //createOrbitCircle(16);
 
     // initialize mars
@@ -243,7 +254,7 @@ function initGeometry() {
     //createOrbitCircle(55);
 
     var FloorGeo = new THREE.BoxGeometry(150, 5, 300);
-    var floormaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    var floormaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
     var floor = new THREE.Mesh(FloorGeo, floormaterial);
     var floorTransform = new THREE.Matrix4().makeTranslation(0, -20, 0);
 
@@ -261,9 +272,15 @@ function initGeometry() {
         //console.log(map);
         //console.log("hi");
         //console.log(map[0][0]);
+<<<<<<< HEAD
         
         var offsetX = 1;
         var offsetY = 1;
+=======
+
+        var offsetX;
+        var offsetY;
+>>>>>>> ed9b936e62fffa9e4f3c49e90334715cb4d1e720
 
         for (x = 0; x < 4; x++) {
             for (y = 0; y < 2; y++) {
@@ -296,7 +313,7 @@ function updateSystem() {
     // orbit around sun
     mercury.applyMatrix(new THREE.Matrix4().makeRotationY(0.04));
     venus.applyMatrix(new THREE.Matrix4().makeRotationY(0.02));
-    earth.applyMatrix(new THREE.Matrix4().makeRotationY(0.01));
+    // earth.applyMatrix(new THREE.Matrix4().makeRotationY(0.01));
     mars.applyMatrix(new THREE.Matrix4().makeRotationY(0.008));
     jupiter.applyMatrix(new THREE.Matrix4().makeRotationY(0.005));
     saturn.applyMatrix(new THREE.Matrix4().makeRotationY(0.003));
@@ -306,7 +323,7 @@ function updateSystem() {
     // planet individual rotations
     mercury.rotateOnAxis(new THREE.Vector3(0, 1, 0), 0.000853);
     venus.rotateOnAxis(new THREE.Vector3(0, 1, 0), -0.0002057);
-    earth.rotateOnAxis(new THREE.Vector3(0, 1, 0), 0.05);
+    // earth.rotateOnAxis(new THREE.Vector3(0, 1, 0), 0.05);
     mars.rotateOnAxis(new THREE.Vector3(0, 1, 0), 0.0487);
     jupiter.rotateOnAxis(new THREE.Vector3(0, 1, 0), 0.1219);
     saturn.rotateOnAxis(new THREE.Vector3(0, 1, 0), 0.11737);
@@ -376,15 +393,19 @@ function registerKeyboardListeners() {
 function onKeyDown(event) {
     if (keyboard.eventMatches(event, "w")) {
         // move camera forwards
+        earth.translateOnAxis(new THREE.Vector3(0,0,-1), 1);
     }
     else if (keyboard.eventMatches(event, "s")) {
         // move camera back
+        earth.translateOnAxis(new THREE.Vector3(0,0,-1), -1);
     }
     else if (keyboard.eventMatches(event, "a")) {
         // rotate camera left
+        earth.rotateY(0.1);
     }
     else if (keyboard.eventMatches(event, "d")) {
         // rotate camera right
+        earth.rotateY(-0.1);
     }
 }
 
@@ -611,6 +632,7 @@ function makeMap() {
 }
 
 
+<<<<<<< HEAD
 //takes in index of the map 
 function createMap(mapSector, floor, offsetX, offsetY, x) {
     var unitWallGeo = new THREE.BoxGeometry(5, 15, 5);
@@ -619,6 +641,14 @@ function createMap(mapSector, floor, offsetX, offsetY, x) {
     
     var posX = 112.5 - (75 * x);
     var posY = 37.5 * offsetY;
+=======
+//takes in index of the map
+function createMap(mapSector, floor, offsetX, offsetY) {
+    var unitWallGeo = new THREE.BoxGeometry(5, 15, 5);
+    var fill = new THREE.BoxGeometry(75, 15, 75);
+    var material = new THREE.MeshPhongMaterial({ color: 0xffffff });
+
+>>>>>>> ed9b936e62fffa9e4f3c49e90334715cb4d1e720
 
     if (mapSector == 0) {
         //console.log("creating fill");
