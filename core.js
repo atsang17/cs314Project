@@ -16,7 +16,7 @@ var controls;
 var sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune;
 var sunHeight = 500;
 var earthRadius = 1, sunRadius = 5;
-var enemyObjects = [sun];
+var collidableObjects = [];
 
 // ============================================================================
 //
@@ -158,9 +158,10 @@ function initGeometry() {
     sun = new THREE.Mesh(sunGeometry, material);
     var sunPosition = new THREE.Matrix4().makeTranslation(0, 0, 50);
     sun.applyMatrix(sunPosition);
+    collidableObjects.push(sun);
     scene.add(sun);
 
-    // // initialize mercury
+    // initialize mercury
     // var material = new THREE.MeshPhongMaterial();
     // var mercuryGeometry = new THREE.SphereGeometry(0.5, 32, 32);
     // generateVertexColors(mercuryGeometry);
@@ -180,9 +181,9 @@ function initGeometry() {
     // var venusPosition = new THREE.Matrix4().makeTranslation(13, 0, 0);
     // venus.applyMatrix(venusPosition);
     // sun.add(venus);
-    // //createOrbitCircle(13);
-    //
-    // // initialize mars
+    //createOrbitCircle(13);
+
+    // initialize mars
     // var material = new THREE.MeshPhongMaterial();
     // var marsGeometry = new THREE.SphereGeometry(1, 32, 32);
     // generateVertexColors(venusGeometry);
@@ -382,27 +383,36 @@ function onKeyDown(event) {
         // move camera forwards
         earth.translateOnAxis(new THREE.Vector3(0,0,-1), 1);
 
-        // enemy collision detection. Relatively simple, we don't need it to be
-        // super exact for the sun;
+        // basic collision detection. currently hard-coded for the sun
+        var raycaster = new THREE.Raycaster();
         var earthPosition = new THREE.Vector3(earth.position.x, earth.position.y, earth.position.z);
         var sunPosition = new THREE.Vector3(sun.position.x, sun.position.y, sun.position.z);
 
-        if (earthPosition.distanceTo(sunPosition) <= earthRadius + sunRadius) {
-          beginBossFight();
+        var rayDirection = sunPosition.clone().sub(earthPosition);
+        raycaster.set(earthPosition, rayDirection.normalize());
+        var intersectedObjects = raycaster.intersectObjects(collidableObjects, true);
+        if (intersectedObjects.length > 0 && intersectedObjects[0].distance < earthRadius + 1) {
+          alert('help');
+          earth.translateOnAxis(new THREE.Vector3(0,0,-1), -1);
         }
+
     }
     else if (keyboard.eventMatches(event, "s")) {
-        // move camera back
-        earth.translateOnAxis(new THREE.Vector3(0,0,-1), -1);
+      // move camera forwards
+      earth.translateOnAxis(new THREE.Vector3(0,0,-1), -1);
 
-        // enemy collision detection. Relatively simple, we don't need it to be
-        // super exact for the sun;
-        var earthPosition = new THREE.Vector3(earth.position.x, earth.position.y, earth.position.z);
-        var sunPosition = new THREE.Vector3(sun.position.x, sun.position.y, sun.position.z);
+      // basic collision detection. currently hard-coded for the sun
+      var raycaster = new THREE.Raycaster();
+      var earthPosition = new THREE.Vector3(earth.position.x, earth.position.y, earth.position.z);
+      var sunPosition = new THREE.Vector3(sun.position.x, sun.position.y, sun.position.z);
 
-        if (earthPosition.distanceTo(sunPosition) <= earthRadius + sunRadius) {
-          beginBossFight();
-        }
+      var rayDirection = sunPosition.clone().sub(earthPosition);
+      raycaster.set(earthPosition, rayDirection.normalize());
+      var intersectedObjects = raycaster.intersectObjects(collidableObjects, true);
+      if (intersectedObjects.length > 0 && intersectedObjects[0].distance < earthRadius + 1) {
+        alert('help');
+        earth.translateOnAxis(new THREE.Vector3(0,0,-1), 1);
+      }
     }
     else if (keyboard.eventMatches(event, "a")) {
         // rotate camera left
@@ -425,7 +435,7 @@ function mousedown(event) {
     var mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
     var raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(new THREE.Vector2(mouseX, mouseY), fullCamera);
-    intersectedObjects = raycaster.intersectObjects(scene.children, true);
+    var intersectedObjects = raycaster.intersectObjects(scene.children, true);
     var object = intersectedObjects[0].object;
 
     // currently drops a sphere in the scene if the raycast hits something
