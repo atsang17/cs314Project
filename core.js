@@ -15,18 +15,27 @@ var controls;
 var sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune;
 
 // ----------------------------------------------------------------------------
+//
 // MAIN
+//
 // ----------------------------------------------------------------------------
 
 renderer.setClearColor(0x000000); // white background colour
 canvas.appendChild(renderer.domElement);
 
+keyboard.domElement.addEventListener( 'mousedown', mousedown);
+keyboard.domElement.addEventListener( 'mouseup', mouseup);
+
 initCamera();
 initGeometry();
 update();
 
+
+
 // ----------------------------------------------------------------------------
+//
 // HELPER FUNCTIONS
+//
 // ----------------------------------------------------------------------------
 
 function initCamera() {
@@ -163,7 +172,7 @@ function initGeometry() {
 
   // initialize earth
   var material = new THREE.MeshPhongMaterial();
-  material.map = THREE.ImageUtils.loadTexture('assets/earthmap1k.jpg');
+  // material.map = THREE.ImageUtils.loadTexture('assets/earthmap1k.jpg');
   var earthGeometry = new THREE.SphereGeometry( 1, 32, 32 );
   generateVertexColors(earthGeometry);
   earth = new THREE.Mesh( earthGeometry, material);
@@ -319,4 +328,39 @@ function update() {
   renderer.render( scene, mapCamera );
 
   requestAnimationFrame(update);
+}
+
+
+
+// ----------------------------------------------------------------------------
+//
+// LISTENERS
+//
+// ----------------------------------------------------------------------------
+
+function mousedown(event) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  // more advanced picking logic goes here
+
+  // convert mouse coordinates to NDCS since setFromCamera assumes mouse vector is in NDC
+  var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+  var mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+  var raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(new THREE.Vector2(mouseX, mouseY), fullCamera);
+  intersectedObjects = raycaster.intersectObjects(scene.children, true);
+  var object = intersectedObjects[0].object;
+
+  var mat = new THREE.MeshPhongMaterial();
+  var testGeometry = new THREE.SphereGeometry( 2, 32, 32 );
+  generateVertexColors(testGeometry);
+  testSphere = new THREE.Mesh(testGeometry, mat);
+  testSphere.applyMatrix(new THREE.Matrix4().makeTranslation(object.position.x, object.position.y, object.position.z));
+  scene.add(testSphere);
+}
+
+function mouseup(event) {
+  event.preventDefault();
+  event.stopPropagation();
 }
