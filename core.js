@@ -3,8 +3,6 @@ var canvas = document.getElementById('canvas');
 var scene = new THREE.Scene();
 var keyboard = new THREEx.KeyboardState();
 var renderer = new THREE.WebGLRenderer();
-renderer.setClearColor(0x000000); // white background colour
-canvas.appendChild(renderer.domElement);
 
 var aspectRatio = window.innerWidth / window.innerHeight;
 var mapHeight = 150;
@@ -16,9 +14,20 @@ var controls;
 
 var sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune;
 
+// ----------------------------------------------------------------------------
+// MAIN
+// ----------------------------------------------------------------------------
+
+renderer.setClearColor(0x000000); // white background colour
+canvas.appendChild(renderer.domElement);
+
 initCamera();
 initGeometry();
 update();
+
+// ----------------------------------------------------------------------------
+// HELPER FUNCTIONS
+// ----------------------------------------------------------------------------
 
 function initCamera() {
   views = [
@@ -243,8 +252,7 @@ function createOrbitCircle(radius) {
   scene.add( orbit );
 }
 
-function updateSystem()
-{
+function updateSystem() {
   // orbit around sun
   sun.applyMatrix(new THREE.Matrix4().makeRotationY(0.001));
   mercury.applyMatrix(new THREE.Matrix4().makeRotationY(0.04));
