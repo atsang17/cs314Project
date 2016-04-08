@@ -3,17 +3,15 @@ Alex Tsang,
 
 what:
 
-  A game where your goal is to navigate a level and fight the enemy at the end.
+  A game where your goal is to smash the earth into the sun, allowing earth to
+  be consumed.
 
 how:
 
 howto:
 
   Move the earth forwards and backwards with the "w" and "s" key, and spin counterclockwise
-  and clockwise with "a" and "d". Interacting with the UI is done by clicking with them
-  mouse; clicking and dragging on the screen won't do anything. A collision with
-  the sun will trigger the change to the fight mode where the "w,s,a,d" controls
-  are completely disabled.
+  and clockwise with "a" and "d". Click on planets to vaporize them.
 
 sources:
 
