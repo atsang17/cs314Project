@@ -15,6 +15,7 @@ var fightMode = false;
 var controls;
 
 var sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune;
+var sunShield;
 var sunHeight = 500;
 var earthRadius = 1, sunRadius = 5;
 var collidableObjects = [];
@@ -238,6 +239,15 @@ function startBossFight() {
 }
 
 function spawnPlanets() {
+  var material = new THREE.MeshBasicMaterial( {color: 0xff22ff} );
+  material.transparent = true;
+  material.opacity = 0.5;
+  var geometry = new THREE.SphereGeometry(6, 32, 32);
+  sunShield = new THREE.Line( geometry, material);
+  var sunShieldPosition = new THREE.Matrix4().makeTranslation(0, 100, 0);
+  sunShield.applyMatrix(sunShieldPosition);
+  scene.add(sunShield);
+
   // initialize mercury
   var material = new THREE.MeshPhongMaterial();
   var mercuryGeometry = new THREE.SphereGeometry(0.5, 32, 32);
@@ -476,6 +486,9 @@ function mousedown(event) {
     if (object) {
       sun.remove(object);
       numberPlanetsToKill--;
+    }
+    if (numberPlanetsToKill <= 0) {
+      scene.remove(sunShield);
     }
     // // currently drops a sphere in the scene if the raycast hits something
     // var mat = new THREE.MeshPhongMaterial();
