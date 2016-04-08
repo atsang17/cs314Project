@@ -5,20 +5,75 @@ var renderer = new THREE.WebGLRenderer();
 renderer.setClearColor(0x000000); // white background colour
 canvas.appendChild(renderer.domElement);
 
-// SETUP CAMERA
-var camera = new THREE.PerspectiveCamera(30,1,0.1,1000); // view angle, aspect ratio, near, far
-camera.position.set(45,20,40);
-camera.lookAt(scene.position);
-scene.add(camera);
+var aspectRatio = window.innerWidth / window.innerHeight;
+var mapHeight = 150;
+var mapWidth = mapHeight * aspectRatio;
+var mouseX = 0, mouseY = 0;
+var windowWidth, windowHeight;
+var views = [
+  {
+		left: 0,
+		bottom: 0,
+		width: 1.0,
+		height: 1.0,
+		background: new THREE.Color().setRGB( 0.1, 0.1, 0.1 ),
+		eye: [ 80, 20, 80 ],
+		up: [ 0, 1, 0 ],
+		fov: 45,
+		updateCamera: function ( camera, scene, mouseX, mouseY ) {		}
+	},
+  {
+    aspectRatio: aspectRatio,
+    left: (-aspectRatio * mapHeight) / 2,
+    right: (aspectRatio * mapHeight) / 2,
+    background: new THREE.Color().setRGB( 1, 1, 1 ),
+    eye: [ 0,1000,0 ],
+    up: [ 0, 1, 0 ],
+    top: mapHeight / 2,
+    bottom: -mapHeight / 2,
+    near: -10000,
+    far: 10000,
+		updateCamera: function ( camera, scene, mouseX, mouseY ) {		}
+	}
+]
+// SETUP CAMERAS
+var view = views[0];
+var fullCamera = new THREE.PerspectiveCamera(view.fov, aspectRatio, 1, 10000); // view angle, aspect ratio, near, far
+fullCamera.position.set(45,20,40);
+fullCamera.position.x = view.eye[ 0 ];
+fullCamera.position.y = view.eye[ 1 ];
+fullCamera.position.z = view.eye[ 2 ];
+fullCamera.up.x = view.up[ 0 ];
+fullCamera.up.y = view.up[ 1 ];
+fullCamera.up.z = view.up[ 2 ];
+fullCamera.lookAt(scene.position);
+view.camera = fullCamera;
+scene.add(fullCamera);
+
+var view = views[1];
+var mapCamera = new THREE.OrthographicCamera(view.left, view.right, view.top, view.bottom, view.near, view.far);
+mapCamera.position.set(45,20,40);
+mapCamera.position.x = view.eye[ 0 ];
+mapCamera.position.y = view.eye[ 1 ];
+mapCamera.position.z = view.eye[ 2 ];
+mapCamera.up.x = view.up[ 0 ];
+mapCamera.up.y = view.up[ 1 ];
+mapCamera.up.z = view.up[ 2 ];
+mapCamera.lookAt(scene.position);
+view.camera = mapCamera;
+scene.add(mapCamera);
 
 // SETUP ORBIT CONTROLS OF THE CAMERA
-var controls = new THREE.OrbitControls(camera);
+var controls = new THREE.OrbitControls(fullCamera);
 
 // ADAPT TO WINDOW RESIZE
 function resize() {
-  renderer.setSize(window.innerWidth,window.innerHeight);
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
+  windowWidth = window.innerWidth;
+	windowHeight = window.innerHeight;
+  renderer.setSize(windowWidth, windowHeight);
+  aspectRatio = window.innerWidth / window.innerHeight;
+  fullCamera.aspect = window.innerWidth/window.innerHeight;
+  fullCamera.updateProjectionMatrix();
 }
 
 // EVENT LISTENER RESIZE
@@ -203,8 +258,45 @@ var keyboard = new THREEx.KeyboardState();
 function update() {
   updateSystem();
 
+  // full camera
+  view = views[0];
+
+  view.updateCamera( fullCamera, scene, mouseX, mouseY );
+
+  var left   = Math.floor( windowWidth  * view.left );
+  var bottom = Math.floor( windowHeight * view.bottom );
+  var width  = Math.floor( windowWidth  * view.width );
+  var height = Math.floor( windowHeight * view.height );
+  renderer.setViewport( left, bottom, width, height );
+  renderer.setScissor(left, bottom, width, height);
+  renderer.enableScissorTest(true);
+  renderer.setClearColor( view.background );
+
+  fullCamera.aspect = width / height;
+  fullCamera.updateProjectionMatrix();
+
+  renderer.render( scene, fullCamera );
+
+  // map camera
+  view = views[1];
+
+  view.updateCamera( mapCamera, scene, mouseX, mouseY );
+
+  var left   = Math.floor( windowWidth  * view.left );
+  var bottom = Math.floor( windowHeight * view.bottom );
+  var width  = Math.floor( windowWidth  * view.width );
+  var height = Math.floor( windowHeight * view.height );
+  renderer.setViewport( windowWidth - mapWidth, windowHeight - mapHeight, mapWidth, mapHeight );
+  renderer.setScissor(windowWidth - mapWidth, windowHeight - mapHeight, mapWidth, mapHeight);
+  renderer.enableScissorTest(true);
+  renderer.setClearColor( view.background );
+
+  mapCamera.aspect = width / height;
+  mapCamera.updateProjectionMatrix();
+
+  renderer.render( scene, mapCamera );
+
   requestAnimationFrame(update);
-  renderer.render(scene,camera);
 }
 
 update();
