@@ -172,7 +172,7 @@ function initGeometry() {
 
   // initialize earth
   var material = new THREE.MeshPhongMaterial();
-  // material.map = THREE.ImageUtils.loadTexture('assets/earthmap1k.jpg');
+  material.map = THREE.ImageUtils.loadTexture('assets/earthmap1k.jpg');
   var earthGeometry = new THREE.SphereGeometry( 1, 32, 32 );
   generateVertexColors(earthGeometry);
   earth = new THREE.Mesh( earthGeometry, material);
@@ -263,7 +263,7 @@ function createOrbitCircle(radius) {
 
 function updateSystem() {
   // orbit around sun
-  sun.applyMatrix(new THREE.Matrix4().makeRotationY(0.001));
+  // sun.applyMatrix(new THREE.Matrix4().makeRotationY(0.001));
   mercury.applyMatrix(new THREE.Matrix4().makeRotationY(0.04));
   venus.applyMatrix(new THREE.Matrix4().makeRotationY(0.02));
   earth.applyMatrix(new THREE.Matrix4().makeRotationY(0.01));
@@ -346,7 +346,7 @@ function mousedown(event) {
 
   // convert mouse coordinates to NDCS since setFromCamera assumes mouse vector is in NDC
   var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-  var mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+  var mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
   var raycaster = new THREE.Raycaster();
   raycaster.setFromCamera(new THREE.Vector2(mouseX, mouseY), fullCamera);
   intersectedObjects = raycaster.intersectObjects(scene.children, true);
