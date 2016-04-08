@@ -14,11 +14,11 @@ var controls;
 
 var sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune;
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 //
 // MAIN
 //
-// ----------------------------------------------------------------------------
+// ============================================================================
 
 renderer.setClearColor(0x000000); // white background colour
 canvas.appendChild(renderer.domElement);
@@ -32,11 +32,11 @@ update();
 
 
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 //
 // HELPER FUNCTIONS
 //
-// ----------------------------------------------------------------------------
+// ============================================================================
 
 function initCamera() {
   views = [
@@ -263,7 +263,7 @@ function createOrbitCircle(radius) {
 
 function updateSystem() {
   // orbit around sun
-  // sun.applyMatrix(new THREE.Matrix4().makeRotationY(0.001));
+  sun.applyMatrix(new THREE.Matrix4().makeRotationY(0.001));
   mercury.applyMatrix(new THREE.Matrix4().makeRotationY(0.04));
   venus.applyMatrix(new THREE.Matrix4().makeRotationY(0.02));
   earth.applyMatrix(new THREE.Matrix4().makeRotationY(0.01));
@@ -332,11 +332,12 @@ function update() {
 
 
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 //
 // LISTENERS
 //
-// ----------------------------------------------------------------------------
+// ============================================================================
+
 
 function mousedown(event) {
   event.preventDefault();
@@ -352,6 +353,7 @@ function mousedown(event) {
   intersectedObjects = raycaster.intersectObjects(scene.children, true);
   var object = intersectedObjects[0].object;
 
+  // currently drops a sphere in the scene if the raycast hits something
   var mat = new THREE.MeshPhongMaterial();
   var testGeometry = new THREE.SphereGeometry( 2, 32, 32 );
   generateVertexColors(testGeometry);
