@@ -87,6 +87,8 @@ function initCamera() {
     var earthGeometry = new THREE.SphereGeometry(1, 32, 32);
     generateVertexColors(earthGeometry);
     earth = new THREE.Mesh(earthGeometry, material);
+    var earthPosition = new THREE.Matrix4().makeTranslation(0, 100, 0);
+    earth.applyMatrix(earthPosition);
     scene.add(earth);
 
     // setup camera to follow earth
@@ -136,7 +138,7 @@ function initGeometry() {
     // sun light
     lights[0] = new THREE.PointLight(0xffffff, 1, 0);
     lights[0].castShadow = true;
-    lights[0].position.set(0, 10, 0);
+    lights[0].position.set(0, 100, 50);
     scene.add(lights[0]);
 
     // Create Solar System
@@ -145,7 +147,7 @@ function initGeometry() {
     var material = new THREE.MeshBasicMaterial();
     material.map = THREE.ImageUtils.loadTexture('assets/sunmap.jpg');
     sun = new THREE.Mesh(sunGeometry, material);
-    var sunPosition = new THREE.Matrix4().makeTranslation(0, 0, 50);
+    var sunPosition = new THREE.Matrix4().makeTranslation(0, 100, 50);
     sun.applyMatrix(sunPosition);
     collidableObjects.push(sun);
     scene.add(sun);
@@ -683,7 +685,7 @@ function makeMap() {
 
 }
 
-//takes in index of the map 
+//takes in index of the map
 function createMap(mapSector, floor, offsetX, offsetY, xInput, yInput) {
     var unitWallGeo = new THREE.BoxGeometry(5, 12.5, 5);
     var fill = new THREE.BoxGeometry(75, 15, 75);
